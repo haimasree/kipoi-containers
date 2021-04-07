@@ -4,6 +4,11 @@ name: Build, test and push images on demand
 on: 
   workflow_dispatch:
 
+inputs:
+  push:
+    description: 'Push the docker images'
+    required: false
+    default: '1'
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   buildtestandpush:
