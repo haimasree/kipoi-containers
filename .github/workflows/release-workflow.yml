@@ -7,7 +7,7 @@ on:
       push:
         description: 'Push the docker images'
         required: false
-        default: '1'
+        default: 'Yes'
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   buildtestandpush:
@@ -37,8 +37,9 @@ jobs:
         docker build -f dockerfiles/Dockerfile.${{ matrix.image }} -t haimasree/kipoi-docker:${{ matrix.image }} . 
         pytest -s test-containers/test_containers_from_command_line.py --image=haimasree/kipoi-docker:${{ matrix.image }} 
     - name: Push ${{ matrix.image }}
-      if: ${{ success() }}
+      if: ${{ success() }} && ${{ INPUT_PUSH }}
       run: |
+        echo ${{ INPUT_PUSH }}
         docker login --username ${{ secrets.DOCKERUSERNAME }} --password ${{ secrets.DOCKERPASSWORD }}
         docker push haimasree/kipoi-docker:${{ matrix.image }} 
         docker system prune -a -f
@@ -91,7 +92,7 @@ jobs:
         docker build -f dockerfiles/Dockerfile.kipoi-base-env -t haimasree/kipoi-docker:kipoi-base-env . 
         docker build -f dockerfiles/Dockerfile.sharedpy3keras2 -t haimasree/kipoi-docker:sharedpy3keras2 . 
     - name: Push kipoi-base-env and sharedpy3keras2
-      if: ${{ success() }}
+      if: ${{ success() }} && ${{ INPUT_PUSH }}
       run: |
         docker login --username ${{ secrets.DOCKERUSERNAME }} --password ${{ secrets.DOCKERPASSWORD }}
         docker push haimasree/kipoi-docker:kipoi-base-env
